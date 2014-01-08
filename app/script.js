@@ -62,9 +62,15 @@
 
 			if (id === 'prcIsum_bidPrice' || id === 'prcIsum') {
 				var shippingCost = parseFloat($('#isum-shipCostDiv').text().replace(/[^0-9\.]+/g, "").replace(",",""));
-					withShippingCost =  ' / ' + (Math.round(shippingCost * self.rate) + newPrice);
+					withShippingCost = (Math.round(shippingCost * self.rate) + newPrice);
+				if (!isNaN(withShippingCost)) {
+					withShippingCost = ' / ' + withShippingCost;
+				} else {
+					withShippingCost = '';
+				}
 			}
 			if (!isNaN(newPrice)) {
+
 				this.innerHTML += '<span class="b-app-rubles">(' + newPrice + withShippingCost + ' руб.)</div>';
 			}
 		});
