@@ -1,0 +1,8 @@
+.b-app-rubles {
+  font-size: 14px;
+  font-weight: bold;
+  color: green !important;
+  white-space: nowrap;
+  text-align: right;
+  margin: 0 10px;
+}
