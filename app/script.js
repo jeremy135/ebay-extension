@@ -22,7 +22,9 @@
 		if (localStorage.getItem('date') !== this.currentDate) {
 			this.ajax();
 		} else {
-			this.rate = localStorage.getItem('rate');
+			this.rateUS = localStorage.getItem('rate_usd');
+			this.rateAU = localStorage.getItem('rate_aud');
+			this.rateGBP = localStorage.getItem('rate_gbp');
 			this.insertPrice();
 		}
 	};
@@ -44,10 +46,19 @@
 			console.log('empty xml. Fail.');
 			return;
 		}
-		var usd = $(xml).find('Valute[ID="R01235"] Value').html(),
-			rate = usd.replace(',', '.');
-		this.rate = rate;
-		localStorage.setItem('rate', this.rate);
+		var $xml = $(xml),
+			usd = $xml.find('Valute[ID="R01235"] Value').html(),
+			gbp = $xml.find('Valute[ID="R01035"] Value').html(),
+			aud = $xml.find('Valute[ID="R01010"] Value').html(),
+			rateUS = usd.replace(',', '.'),
+			rateGBP = gbp.replace(',', '.'),
+			rateAU = aud.replace(',', '.');
+		this.rateUS = rateUS;
+		this.rateGBP = rateGBP;
+		this.rateAU = rateAU;
+		localStorage.setItem('rate_usd', this.rateUS);
+		localStorage.setItem('rate_gbp', this.rateGBP);
+		localStorage.setItem('rate_aud', this.rateAU);
 		localStorage.setItem('date', this.currentDate);
 		this.insertPrice();
 	};
@@ -55,14 +66,24 @@
 	App.fn.insertPrice = function() {
 		var self = this;
 		$(this.priceSelectors).each(function() {
-			var price = parseFloat($(this).text().replace(/[^0-9\.]+/g, "").replace(",","")),
-				newPrice = Math.round(price * self.rate),
+			var content = $(this).text(),
+				price = parseFloat(content.replace(/[^0-9\.]+/g, "").replace(",","")),
+				newPrice = '',
 				withShippingCost = '',
-				id = this.id;
+				id = this.id,
+				currency = "US";
+			if (content.match(/US/)) {
+				currency = "US";
+			} else if (content.match(/GBP/)) {
+				currency = "GBP";
+			} else if (content.match(/AU/)) {
+				currency = "AU";
+			}
+			newPrice = Math.round(price * self['rate' + currency]);
 
 			if (id === 'prcIsum_bidPrice' || id === 'prcIsum') {
 				var shippingCost = parseFloat($('#isum-shipCostDiv').text().replace(/[^0-9\.]+/g, "").replace(",",""));
-					withShippingCost = (Math.round(shippingCost * self.rate) + newPrice);
+					withShippingCost = (Math.round(shippingCost * self['rate' + currency]) + newPrice);
 				if (!isNaN(withShippingCost)) {
 					withShippingCost = ' / ' + withShippingCost;
 				} else {
