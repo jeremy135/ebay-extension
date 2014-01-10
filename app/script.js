@@ -25,6 +25,7 @@
 			this.rateUS = localStorage.getItem('rate_usd');
 			this.rateAU = localStorage.getItem('rate_aud');
 			this.rateGBP = localStorage.getItem('rate_gbp');
+			this.rateCAD = localStorage.getItem('rate_cad');
 			this.insertPrice();
 		}
 	};
@@ -50,15 +51,19 @@
 			usd = $xml.find('Valute[ID="R01235"] Value').html(),
 			gbp = $xml.find('Valute[ID="R01035"] Value').html(),
 			aud = $xml.find('Valute[ID="R01010"] Value').html(),
+			cad = $xml.find('Valute[ID="R01350"] Value').html(),
 			rateUS = usd.replace(',', '.'),
 			rateGBP = gbp.replace(',', '.'),
-			rateAU = aud.replace(',', '.');
+			rateAU = aud.replace(',', '.'),
+			rateCAD = cad.replace(',', '.');
 		this.rateUS = rateUS;
 		this.rateGBP = rateGBP;
 		this.rateAU = rateAU;
+		this.rateCAD = rateCAD;
 		localStorage.setItem('rate_usd', this.rateUS);
 		localStorage.setItem('rate_gbp', this.rateGBP);
 		localStorage.setItem('rate_aud', this.rateAU);
+		localStorage.setItem('rate_cad', this.rateCAD);
 		localStorage.setItem('date', this.currentDate);
 		this.insertPrice();
 	};
@@ -68,7 +73,7 @@
 		$(this.priceSelectors).each(function() {
 			var content = $(this).text(),
 				price = parseFloat(content.replace(/[^0-9\.]+/g, "").replace(",","")),
-				newPrice = '',
+				newPrice,
 				withShippingCost = '',
 				id = this.id,
 				currency = "US";
@@ -78,6 +83,8 @@
 				currency = "GBP";
 			} else if (content.match(/AU/)) {
 				currency = "AU";
+			} else if (content.match(/C/)) {
+				currency = "CAD";
 			}
 			newPrice = Math.round(price * self['rate' + currency]);
 

@@ -1,19 +1,25 @@
-version 0.2
+= Changelog =
+== version 0.2.1 ==
 
-8 Jan 2013
+11 Jan 2014
 
--transfer AU and GBP
+- transfer CAD
 
-version 0.1.1
+== version 0.2 ==
 
-8 Jan 2013
+8 Jan 2014
+
+- transfer AU and GBP
+
+== version 0.1.1 ==
+
+8 Jan 2014
 
 - fixed price with FREE shipping
 
+== version 0.1 ==
 
-version 0.1
-
-8 Jan 2013
+8 Jan 2014
 
 - transfer $ to rubles
 - show sum price and cost shipping
