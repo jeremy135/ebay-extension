@@ -104,7 +104,7 @@
       }
       if (!isNaN(newPrice)) {
 
-        this.innerHTML += '<span class="b-app-rubles">(' + newPrice + withShippingCost + ' руб.)</div>';
+        $(this).after('<span class="b-app-rubles">(' + newPrice + withShippingCost + ' руб.)</div>');
       }
     });
   };
