@@ -30,6 +30,7 @@
       this.rateCAD = localStorage.getItem('rate_cad');
       this.insertPrice();
     }
+    this.convertToLocalTime();
   };
 
   App.fn.ajax = function() {
@@ -106,6 +107,25 @@
         this.innerHTML += '<span class="b-app-rubles">(' + newPrice + withShippingCost + ' руб.)</div>';
       }
     });
+  };
+
+  App.fn.convertToLocalTime = function() {
+    var timeNode = document.querySelector('.endedDate');
+    if (timeNode) {
+      var localHours = new Date().getHours(),
+          PDTTime = new Date().getUTCHours() - 7,
+          dfTime = PDTTime - localHours,
+          time = timeNode.innerHTML;
+      if (String(time).match(/PDT/)) {
+        var endHours = time.match(/^\d\d/),
+            endHoursLocal = endHours - 0 - dfTime,
+            timeStr = time.replace(/[A-Za-z()\s]/g, "")
+                .replace(/^\d\d/, endHoursLocal),
+            timeZone = String(String(new Date()).split("(")[1]).split(")")[0];
+        timeNode.innerHTML += '<span class="b-app-rubles">' + timeStr + ' ' +
+            timeZone +  '</span>';
+      }
+    }
   };
 
   App.fn.updatePrice = function() {
