@@ -9,7 +9,9 @@
         'div[itemprop="price"]',
         '.nume_price',
         'p.g-asmR',
-        'p.g-asmG'
+        'p.g-asmG',
+        'h4.cost-label',
+        'span.price'
       ].join(',');
     };
 
@@ -94,36 +96,71 @@
       newPrice = Math.round(price * self['rate' + currency]);
 
       if (id === 'prcIsum_bidPrice' || id === 'prcIsum') {
-        var shippingCost = parseFloat($('#isum-shipCostDiv').text().replace(/[^0-9\.]+/g, "").replace(",",""));
-        withShippingCost = (Math.round(shippingCost * self['rate' + currency]) + newPrice);
+        var shippingCost = parseFloat($('#isum-shipCostDiv').text()
+            .replace(/[^0-9\.]+/g, "").replace(",",""));
+        withShippingCost = (Math.round(shippingCost * self['rate' + currency]) +
+            newPrice);
         if (!isNaN(withShippingCost)) {
-          withShippingCost = ' / ' + withShippingCost;
+          withShippingCost = ' / ' + self.moneyFormat(withShippingCost);
         } else {
           withShippingCost = '';
         }
       }
       if (!isNaN(newPrice)) {
-
-        $(this).after('<span class="b-app-rubles">(' + newPrice + withShippingCost + ' руб.)</div>');
+        $(this).after('<span class="b-app-rubles">(' +
+            self.moneyFormat(newPrice) + withShippingCost + ' руб.)</div>');
       }
     });
   };
 
+  App.fn.moneyFormat = function(num) {
+    var strNum = '' + parseFloat(num).toFixed(2),
+        parts = strNum.split('.'),
+        head = parts[0] || '',
+        tail = parts[1] || '',
+        s = [];
+    if (head) {
+      var l = head.length,
+          p = Math.floor(l / 3);
+      for (var i = 0; i < p; i++) {
+        s.push(head.substr(l - (i * 3) - 3, 3));
+      }
+      s.push(head.substr(0, (l % 3)));
+      s.reverse();
+    }
+    if (s.length > 0) {
+      return s.join(' ') + '.' + tail;
+    } else {
+      return num;
+    }
+  };
+
   App.fn.convertToLocalTime = function() {
-    var timeNode = document.querySelector('.endedDate');
-    if (timeNode) {
-      var localHours = new Date().getHours(),
-          PDTTime = new Date().getUTCHours() - 7,
-          dfTime = PDTTime - localHours,
-          time = timeNode.innerHTML;
-      if (String(time).match(/PDT/)) {
-        var endHours = time.match(/^\d\d/),
-            endHoursLocal = endHours - 0 - dfTime,
-            timeStr = time.replace(/[A-Za-z()\s]/g, "")
-                .replace(/^\d\d/, endHoursLocal),
-            timeZone = String(String(new Date()).split("(")[1]).split(")")[0];
-        timeNode.innerHTML += '<span class="b-app-rubles">' + timeStr + ' ' +
-            timeZone +  '</span>';
+    var timeNode = document.querySelectorAll('.endedDate, .time-ampm');
+    if (timeNode && timeNode.length > 0) {
+      var l = timeNode.length,
+          //diff with local time
+          dfTime = new Date().getUTCHours() - 7 - new Date().getHours(),
+          timeZone = String(String(new Date()).split("(")[1]).split(")")[0],
+          time, endHours, nextDay, endHoursLocal;
+      while (l--) {
+            time = timeNode[l].innerHTML;
+        if (String(time).match(/PDT/)) {
+          endHours = time.match(/^\d\d/);
+          if (String(time).match(/PM/)) {
+            endHours = endHours - 0 + 12
+          }
+          endHoursLocal = endHours - 0 - dfTime;
+          nextDay = '';
+          if (endHoursLocal > 24) {
+            endHoursLocal -= 24;
+            nextDay = '(+1 день)';
+          }
+          var timeStr = time.replace(/[A-Za-z()\s<>\.,]/g, "")
+                  .replace(/^\d\d/, endHoursLocal);
+          $(timeNode[l]).after('<span class="b-app-rubles">' + timeStr + ' ' +
+              timeZone + nextDay +  '</span>');
+        }
       }
     }
   };

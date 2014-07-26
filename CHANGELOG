@@ -1,4 +1,14 @@
 = Changelog =
+== version 0.4.0 ==
+
+26 Jul 2014
+
+- money formated price view
+
+- local time fixed
+
+- local time & price in bind list
+
 == version 0.3.1 ==
 
 26 Jul 2014
